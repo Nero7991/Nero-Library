@@ -43,6 +43,9 @@ void NRF24L01::initialize(){
 	#endif
 	setTransmitAddress(0xBABABABAB5);
 	setReceive0Address(0xBABABABAB5);
+	//if(Mode)
+	//setReceivePayloadLength(0,BufferLength_MasterTX);
+	writeSPIRegister(SETUP_RETR, 0, 1);
 	setRFDataRate(1);
 	setMode(Mode);
 	if(Enable_DPL){
@@ -52,16 +55,20 @@ void NRF24L01::initialize(){
 		enableACKWithPayload(true);
 	}
 	if(!Enable_DPL){
-		writeSPIRegister(0x11,BufferLength_MasterTX,1);
+		//enableAutoACK(true);
+		//enableReceiveAddress(0, 1);
+		//writeSPIRegister(0x11,BufferLength_MasterTX,1);
 	}
 	powerON(true);
 }
 
 void NRF24L01::setMode(bool set){
 	temp = readSPIRegister(NRF_CONFIG,1);
+	printHexNumber(temp, 1);
 	temp &= ~(1 << PRIM_RX);
 	temp |= (set << PRIM_RX);
 	writeSPIRegister(NRF_CONFIG, temp, 1);
+	
 	if(set){
 		#ifdef STATS
 		Notify(PSTR("Starting nRF24L01 in Receive Mode..."));
@@ -82,6 +89,24 @@ void NRF24L01::setMode(bool set){
 		Notify(PSTR("Initializing successful."));
 		#endif
 	}
+}
+
+void NRF24L01::setReceivePayloadLength(uint8_t pipe, uint8_t length){
+	writeSPIRegister(RX_PW_P0 + pipe, length, 1);
+}
+
+void NRF24L01::enableReceiveAddress(uint8_t pipe, bool set){
+	temp = readSPIRegister(EN_RXADDR,1);
+	temp &= ~(1 << pipe);
+	temp |= (set << pipe);
+	writeSPIRegister(EN_RXADDR, temp, 1);
+}
+
+void NRF24L01::enableAutoACK(bool set){
+	temp = readSPIRegister(EN_AA,1);
+	temp &= ~(1 << 0);
+	temp |= (set << 0);
+	writeSPIRegister(EN_AA, temp, 1);
 }
 
 void NRF24L01::enableACKWithPayload(bool set){
@@ -148,6 +173,18 @@ uint8_t NRF24L01::isRXEmpty(){
 
 uint8_t NRF24L01::isTX_DS_Set(){
 	return ((uint8_t)readSPIRegister(0x07,1) & 0x20);
+}
+
+uint8_t NRF24L01::isRT_Max_Set(){
+	return ((uint8_t)readSPIRegister(0x07,1) & 0x10);
+}
+
+void NRF24L01::clearTX_DS(){
+	writeSPIRegister(0x07,0x20,1);
+}
+
+void NRF24L01::clearRT_Max(){
+	writeSPIRegister(0x07,0x10,1);
 }
 
 

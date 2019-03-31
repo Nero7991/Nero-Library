@@ -9,7 +9,7 @@
 
 TimerClass Timer;
 
-TimerClass *TimerClass::Timers[];
+TimerClass *TimerClass::Timers[30];
 
 uint64_t TimerClass::Time = 0;
 
@@ -18,13 +18,17 @@ uint8_t TimerClass::i = 0;
 
 void TimerClass::begin(){
 	Init_CTC_T1(1, TIMER1_COUNT_1MS);
-	i = 0;
+	i = 1;
 }
 
 void TimerClass::initializeTimer(){
 	Timers[i] = this;
 	Timer_ID = i;
 	i += 1;
+	#ifdef DEBUG_TIMER
+	printStringCRNL("Timer initialized : ");
+	printNumber(Timer_ID);
+	#endif
 }
 
 void TimerClass::setCallBackTime(uint16_t time, uint8_t mode, Fptr func){
@@ -115,9 +119,11 @@ uint8_t TimerClass::getTimerID(){
 
 
 ISR(TIMER1_COMPA_vect){
+	//printChar('I');
 	milliHappened();
 	Timer.Time += 1;
 	Timer.callAllTimerObjects();
+	//printChar('O');
 }
 
 #ifdef EXT_OSC

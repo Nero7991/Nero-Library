@@ -61,8 +61,8 @@ void SPI_MasterInit(void)
 	/* Set SS bar high */
 	PORTB |= (1 << 2);
 	/* Enable SPI as Master and set clock to FCPU/16 */
-	SPCR |= (1 << SPE) | (1 << MSTR) | (1 << SPR0);
-	SPSR |= (1 << SPI2X);
+	SPCR |= (1 << SPE) | (1 << MSTR) | (1 << SPR1);
+	//SPSR |= (1 << SPI2X);
 }
 
 void initSPISlave(){
@@ -73,6 +73,13 @@ void initSPISlave(){
 	SPCR &= ~(1 << MSTR);
 	SPCR |= (1 << SPE);
 }
+
+void enableSPI(bool set){
+	if(set)
+	SPCR |= (1 << SPE);
+	else
+	SPCR &= ~(1 << SPE);
+} 
 
 void enableSPIInterrupt(bool set){
 	if(set)
@@ -85,7 +92,9 @@ uint8_t SPI_MasterTransmit(char cData){
 	/* Start Transmission */
 	SPDR = cData;
 	/* Wait for transmission complete */
+	//USART_Transmit('I');
 	while(!(SPSR & (1 << SPIF)));
+	//USART_Transmit('O');
 	return SPDR;
 }
 

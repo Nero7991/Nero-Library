@@ -29,6 +29,9 @@
 
 //Registers
 #define NRF_CONFIG				0x00
+#define EN_AA					0x01
+#define EN_RXADDR				0x02
+#define SETUP_RETR				0x04
 #define STATUS					0x07
 #define TX_ADDR					0x10
 #define RX_PW_P0				0x11
@@ -39,6 +42,7 @@
 #define RF_CHANNEL				0x05
 #define DYNPD					0x1C
 #define RX_ADDR_P0				0x0A
+
 
 //Commands				
 #define ACTIVATE				0x50
@@ -63,6 +67,10 @@ NRF24L01(uint8_t BufferLength_MasterTX, bool mode);
 
 NRF24L01(uint8_t BufferLength_MasterTX, uint8_t BufferLength_MasterRX, bool mode);
 
+void clearTX_DS();
+
+void clearRT_Max();
+
 uint8_t isTXFull();
 
 uint8_t isTXEmpty();
@@ -72,6 +80,8 @@ uint8_t isRXFull();
 uint8_t isRXEmpty();
 
 uint8_t isTX_DS_Set();
+
+uint8_t isRT_Max_Set();
 
 void readFIFO(volatile uint8_t *data);
 
@@ -98,6 +108,10 @@ void initialize();
 void powerON(bool set);
 
 void setMode(bool set);
+
+void setReceivePayloadLength(uint8_t pipe, uint8_t length);
+
+void enableAutoACK(bool set);
 
 void enableACKWithPayload(bool set);
 

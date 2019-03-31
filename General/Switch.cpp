@@ -76,7 +76,8 @@ void SwitchClass::initializeSwitch(uint8_t portNumber, uint8_t pinNumber, Switch
 	printStringCRNL("Initializing Switch : ");
 	printNumber(Switch_ID);
 	#endif
-	pollAllSwitches();
+	//pollAllSwitches();
+	updatePinBuffers();
 	pollSwitch();
 	DoublePress_EN = 0;
 	MyTimerID = aTimer.getTimerID();
@@ -129,8 +130,8 @@ void SwitchClass::processStateChange(){
 		printString("1->0");
 		#endif
 		//printChar('0');
-		if(FallingEdgePtr != NULL)
-		FallingEdgePtr(Switch_ID);
+		//if(FallingEdgePtr != NULL)
+		//FallingEdgePtr(Switch_ID);
 		if(!S_PressedOnce)
 		aTimer.setCallBackTime(700, 0, callAllOjectLongWait);
 		S_Pressed = 1;
@@ -145,8 +146,8 @@ void SwitchClass::processStateChange(){
 		printString("0->1");
 		#endif 
 		//printChar('1');
-		if(RisingEdgePtr != NULL)
-		RisingEdgePtr(Switch_ID);
+		//if(RisingEdgePtr != NULL)
+		//RisingEdgePtr(Switch_ID);
 		if(!S_DoublePressed)
 		TimePassed = aTimer.getCallBackTime();
 		else
@@ -367,7 +368,7 @@ ISR(INT1_vect){
 }
 
 ISR(PCINT0_vect){
-	Switch.PinStateChangePtr(PORT_B);
+	//Switch.PinStateChangePtr(PORT_B);
 	Switch.PinBuffer[0] = PINB;
 	Switch.PinBuffer[1] = PINC;
 	Switch.PinBuffer[2] = PIND;
@@ -380,7 +381,7 @@ ISR(PCINT0_vect){
 }
 
 ISR(PCINT1_vect){
-	Switch.PinStateChangePtr(PORT_C);
+	//Switch.PinStateChangePtr(PORT_C);
 	Switch.PinBuffer[0] = PINB;
 	Switch.PinBuffer[1] = PINC;
 	Switch.PinBuffer[2] = PIND;
@@ -393,7 +394,7 @@ ISR(PCINT1_vect){
 }
 
 ISR(PCINT2_vect){
-	Switch.PinStateChangePtr(PORT_D);
+	//Switch.PinStateChangePtr(PORT_D);
 	Switch.PinBuffer[0] = PINB;
 	Switch.PinBuffer[1] = PINC;
 	Switch.PinBuffer[2] = PIND;

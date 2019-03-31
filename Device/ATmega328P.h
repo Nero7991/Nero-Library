@@ -63,6 +63,8 @@ bool sleepAllowed();
 
 void initSPISlave();
 
+void enableSPI(bool set);
+
 void enableSPIInterrupt(bool set);
 
 void SPI_MasterInit(void);
