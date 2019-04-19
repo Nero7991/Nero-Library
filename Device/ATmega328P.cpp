@@ -44,6 +44,9 @@ void wakeUp(){
 }
 
 void allowSleep(bool state){
+	#ifdef DEBUG_SLEEP
+	USART_Transmit('S');
+	#endif
 	AllowSleep = state;
 }
 

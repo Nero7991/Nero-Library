@@ -41,17 +41,16 @@ void NRF24L01::initialize(){
 	Notify(PSTR("Master RX Payload length set to : "));
 	printNumber(BufferLength_MasterRX);
 	#endif
-	setTransmitAddress(0xBABABABAB5);
-	setReceive0Address(0xBABABABAB5);
 	//if(Mode)
 	//setReceivePayloadLength(0,BufferLength_MasterTX);
+	testChip();
 	writeSPIRegister(SETUP_RETR, 0, 1);
 	setRFDataRate(1);
 	setMode(Mode);
 	if(Enable_DPL){
+		enableDPLForRXPipe(0, true);
 		toggleActivate();
 		enableDynamicPayloadLength(true);
-		enableDPLForRXPipe(0, true);
 		enableACKWithPayload(true);
 	}
 	if(!Enable_DPL){
@@ -62,9 +61,29 @@ void NRF24L01::initialize(){
 	powerON(true);
 }
 
+void NRF24L01::testChip(){
+	#ifdef STATS
+	Notify(PSTR("Testing nRF..."));
+	#endif
+	temp = readSPIRegister(NRF_CONFIG,1);
+	temp ^= (1 << PRIM_RX);
+	writeSPIRegister(NRF_CONFIG, temp, 1);
+	if(readSPIRegister(NRF_CONFIG, 1) != temp){
+		#ifdef STATS
+		Notify(PSTR("Testing failed for nRF. Check connections"));
+		#endif
+	}
+	else{
+		#ifdef STATS
+		Notify(PSTR("Testing successful."));
+		#endif
+	}
+	temp ^= (1 << PRIM_RX);
+	writeSPIRegister(NRF_CONFIG, temp, 1);
+}
+
 void NRF24L01::setMode(bool set){
 	temp = readSPIRegister(NRF_CONFIG,1);
-	printHexNumber(temp, 1);
 	temp &= ~(1 << PRIM_RX);
 	temp |= (set << PRIM_RX);
 	writeSPIRegister(NRF_CONFIG, temp, 1);
@@ -79,7 +98,7 @@ void NRF24L01::setMode(bool set){
 		Notify(PSTR("Starting nRF24L01 in Transmit Mode..."));
 		#endif
 	}
-	if(readSPIRegister(NRF_CONFIG,1) != temp){
+	if(readSPIRegister(NRF_CONFIG, 1) != temp){
 		#ifdef STATS
 		Notify(PSTR("Initialization failed for nRF24L01. Check connections"));
 		#endif
@@ -171,6 +190,10 @@ uint8_t NRF24L01::isRXEmpty(){
 	return ((uint8_t)readSPIRegister(0x17,1) & 0x01);
 }
 
+bool NRF24L01::isDataReady(){
+	return (bool)(readSPIRegister(0x07,1) & 0x40);
+}
+
 uint8_t NRF24L01::isTX_DS_Set(){
 	return ((uint8_t)readSPIRegister(0x07,1) & 0x20);
 }
@@ -185,6 +208,10 @@ void NRF24L01::clearTX_DS(){
 
 void NRF24L01::clearRT_Max(){
 	writeSPIRegister(0x07,0x10,1);
+}
+
+void NRF24L01::clearRX_DR(){
+	writeSPIRegister(0x07,0x40,1);
 }
 
 
@@ -416,8 +443,8 @@ void NRF24L01::setTransmitAddress(uint64_t address){
 	writeSPIRegister(TX_ADDR, address, 5);
 }
 
-void NRF24L01::setReceive0Address(uint64_t address){
-	writeSPIRegister(RX_ADDR_P0, address, 5);
+void NRF24L01::setReceiveAddress(uint64_t address, uint8_t pipe){
+	writeSPIRegister(RX_ADDR_P0 + pipe, address, 5);
 }
 
 void NRF24L01::flushTX(){

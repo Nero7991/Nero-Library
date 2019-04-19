@@ -18,7 +18,7 @@ class SwitchClass{
 	
 		static uint8_t SwitchState, i, PinBuffer[3];
 		
-		static bool NotFirstSpawn, AllSamePtr_EN, AllShort_EN, AllLong_EN, AllDouble_EN, AllContinuousLong_EN;
+		static bool NotFirstSpawn, AllSamePtr_EN, AllShort_EN, AllLong_EN, AllDouble_EN, AllContinuousLong_EN, AllFallingEdge_EN, AllRisingEdge_EN;
 		
 		static SwitchClass *Sptr[6];
 		
@@ -46,7 +46,7 @@ class SwitchClass{
 		
 		Fptr ShortPressPtr, LongPressPtr, DoublePressPtr, ContinuousLongPressPtr, RisingEdgePtr, FallingEdgePtr; 
 		
-		bool S, S_EN, ShortPress_EN, LongPress_EN, ContinuousLongPress_EN, DoublePress_EN, Timer_EN;
+		bool S, S_EN, ShortPress_EN, LongPress_EN, ContinuousLongPress_EN, DoublePress_EN, Timer_EN, FallingEdge_EN, RisingEdge_EN;
 		
 		bool Old_S, S_Pressed, S_PressedOnce, S_DoublePressed, S_LongPressed;
 		

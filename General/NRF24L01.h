@@ -71,6 +71,10 @@ void clearTX_DS();
 
 void clearRT_Max();
 
+bool isDataReady();
+
+void clearRX_DR();
+
 uint8_t isTXFull();
 
 uint8_t isTXEmpty();
@@ -105,6 +109,8 @@ void fastTransferPayload(volatile uint8_t data);
 
 void initialize();
 
+void testChip();
+
 void powerON(bool set);
 
 void setMode(bool set);
@@ -135,7 +141,7 @@ void readACKPayload(volatile uint8_t *data);
 
 void setTransmitAddress(uint64_t address);
 
-void setReceive0Address(uint64_t address);
+void setReceiveAddress(uint64_t address, uint8_t pipe);
 
 void flushTX();
 

@@ -19,6 +19,8 @@ bool SwitchClass::AllSamePtr_EN = 0;
 bool SwitchClass::AllShort_EN = 0;
 bool SwitchClass::AllDouble_EN = 0;
 bool SwitchClass::AllLong_EN = 0;
+bool SwitchClass::AllFallingEdge_EN = 0;
+bool SwitchClass::AllRisingEdge_EN = 0;
 bool SwitchClass::AllContinuousLong_EN = 0;
 Fptr SwitchClass::AllDoublePressPtr = NULL;
 Fptr SwitchClass::AllLongPressPtr = NULL;
@@ -86,11 +88,13 @@ void SwitchClass::initializeSwitch(uint8_t portNumber, uint8_t pinNumber, Switch
 void SwitchClass::fallingEdge(Fptr callback){
 	FallingEdgePtr = callback;
 	AllFallingEdgePtr = callback;
+	FallingEdge_EN = 1;
 }
 
 void SwitchClass::risingEdge(Fptr callback){
 	RisingEdgePtr = callback;
 	AllRisingEdgePtr = callback;
+	RisingEdge_EN = 1;
 }
 
 void SwitchClass::shortPress(Fptr callback){
@@ -129,9 +133,10 @@ void SwitchClass::processStateChange(){
 		#ifdef DEBUG_SWITCH
 		printString("1->0");
 		#endif
-		//printChar('0');
-		//if(FallingEdgePtr != NULL)
-		//FallingEdgePtr(Switch_ID);
+		if(FallingEdge_EN){
+			if(FallingEdgePtr != NULL)
+			FallingEdgePtr(Switch_ID);
+		}
 		if(!S_PressedOnce)
 		aTimer.setCallBackTime(700, 0, callAllOjectLongWait);
 		S_Pressed = 1;
@@ -145,9 +150,10 @@ void SwitchClass::processStateChange(){
 		#ifdef DEBUG_SWITCH
 		printString("0->1");
 		#endif 
-		//printChar('1');
-		//if(RisingEdgePtr != NULL)
-		//RisingEdgePtr(Switch_ID);
+		if(RisingEdge_EN){
+			if(RisingEdgePtr != NULL)
+			RisingEdgePtr(Switch_ID);
+		}
 		if(!S_DoublePressed)
 		TimePassed = aTimer.getCallBackTime();
 		else
@@ -317,6 +323,8 @@ void SwitchClass::enableSamePtrMode(bool set){
 	AllDouble_EN = set;
 	AllLong_EN = set;
 	AllContinuousLong_EN = set;
+	AllFallingEdge_EN = set;
+	AllRisingEdge_EN = set;
 }
 
 void SwitchClass::updatePinBuffers(){
